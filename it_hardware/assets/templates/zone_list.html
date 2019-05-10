@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Zone List</h1>
+  {% if zone_list %}
+  <ul>
+      {% for zone in zone_list %}
+        <li>
+            <a href="{{ zone.get_absolute_url }}">{{ zone.zone_loc }}</a>
+        </li>
+      {% endfor %}
+  </ul>
+  {% else %}
+    <p>There are no zones in the system.</p>
+  {% endif %}
+{% endblock %}

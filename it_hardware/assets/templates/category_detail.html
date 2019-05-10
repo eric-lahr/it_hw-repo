@@ -1,0 +1,21 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+  <h1>{{ category.asset_cat }}</h1>
+
+  <p>There are  <strong>{{ cat_tot }}</strong> of this asset type.</p>
+
+  {% if cat_eq %}
+  <ul>
+      {% for asset in cat_eq %}
+        <li>
+            <a href="{{ asset.get_absolute_url }}">{{ asset.name }}</a>({{ asset.asset_loc }})
+        </li>
+      {% endfor %}
+  </ul>
+  {% else %}
+    <p>No assets to display.</p>
+  {% endif %}
+{% endblock %}

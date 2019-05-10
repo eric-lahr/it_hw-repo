@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>I.T. Inventory System</h1>
+  <p>Inventory Home Page</p>
+  <h2>Dynamic content</h2>
+  <p>The inventory has the following recoed counts:</p>
+  <ul>
+    <li><strong>PCs:</strong> {{ tot_pcs }}</li>
+    <li><strong>Printers:</strong> {{ tot_prn }}</li>
+    <li><strong>Phones:</strong> {{ tot_phn }}</li>
+    <li><strong>Monitors:</strong> {{ tot_mon }}</li>
+  </ul>
+{% endblock %}

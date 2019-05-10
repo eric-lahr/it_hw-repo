@@ -1,0 +1,21 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+  <h1>{{ zone.zone_loc }}</h1>
+
+  <p>This zone has <strong>{{ loc_num }}</strong> locations.</p>
+
+  {% if loc_list %}
+  <ul>
+      {% for location in loc_list %}
+        <li>
+            <a href="{{ location.get_absolute_url }}">{{ location.asset_loc }}</a>
+        </li>
+      {% endfor %}
+  </ul>
+  {% else %}
+    <p>No locations to display.</p>
+  {% endif %}
+{% endblock %}

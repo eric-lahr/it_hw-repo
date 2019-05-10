@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load staticfiles %}
+  <h1>{{ equipment.name }}</h1>
+
+  <p><strong>System ID#:</strong> {{ equipment.id }}</p>
+  <p><strong>Name:</strong> {{ equipment.name }}</p>
+  <p><strong>Location:</strong> {{ equipment.asset_loc }}</p>
+
+  <a class="btn btn-primary" href="{% url 'equipment-edit' pk=equipment.id %}" role="button">Edit</a>
+
+  <form method="post">
+
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <input class="btn btn-primary" type="submit" value="Submit">
+  </form>
+
+
+{% endblock %}

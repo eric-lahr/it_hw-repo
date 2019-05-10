@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+  <h1>{{ equipment.name }}</h1>
+
+  <p><strong>System ID#:</strong> {{ equipment.id }}</p>
+  <p><strong>Name:</strong> {{ equipment.name }}</p>
+  <p><strong>Location:</strong> {{ equipment.asset_loc }}</p>
+
+  <form action='.' method="POST">
+
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <input class="btn btn-primary" type="submit" value="Submit">
+  </form>
+
+
+{% endblock %}

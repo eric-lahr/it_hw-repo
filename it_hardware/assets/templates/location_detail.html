@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+  <h1>{{ location.asset_loc }}</h1>
+
+  <p>This location has <strong>{{ loc_tot }}</strong> assets.</p>
+
+  {% if loc_eq %}
+  <ul>
+      {% for asset in loc_eq %}
+        <li>
+            <a href="{{ asset.get_absolute_url }}">{{ asset.name }}</a>({{ asset.asset_cat }})
+        </li>
+      {% endfor %}
+  </ul>
+  {% else %}
+    <p>This location has no assets assiged to it.</p>
+  {% endif %}
+
+{% endblock %}
