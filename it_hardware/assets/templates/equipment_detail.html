@@ -10,6 +10,6 @@
   <p><strong>Location:</strong> {{ equipment.asset_loc }}</p>
 
   <a class="btn btn-primary" href="{% url 'equipment-edit' pk=equipment.id %}" role="button">Edit</a>
-
+  <a class="btn btn-primary" href="{% url 'equipment-service' pk=equipment.id %}" role="button">Service</a>
 
 {% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+  <form action='.' method="POST">
+
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <input class="btn btn-primary" type="submit" value="Submit">
+  </form>
+
+
+{% endblock %}

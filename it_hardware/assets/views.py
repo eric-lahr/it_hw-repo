@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from assets.models import Category, Location, Department, Equipment, Action, Zone
+from django.contrib.messages.views import SuccessMessageMixin
 from django.views import generic
 from django.urls import reverse
 from django.urls import reverse_lazy
-from .forms import ServiceForm
+from assets.forms import ServiceForm, LocationCheckForm
 
 
 # Create your views here.
@@ -80,8 +81,35 @@ class EquipmentEditView(generic.UpdateView):
     def get_success_url(self, *args, **kwargs):
         return reverse('equipment-detail', kwargs={'pk': self.kwargs.get('pk')})
 
-# class EquipmentServiceView(generic.CreateView):
-#     model = Account
-#     form_class = ServiceForm
-#     success_url = reverse_lazy('category_detail')
-#     template_name = 'equipment_service.html'
+class EquipmentServiceView(generic.CreateView):
+    template_name = 'equipment_service.html'
+    form_class = ServiceForm
+    queryset = Action.objects.all()
+
+
+class LocationCheckView(generic.FormView):
+    form_class = LocationCheckForm
+    template_name = 'location_check.html'
+    success_url = '/quickcheck/'
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+#def LocationCheckView(request):
+#    form = LocationCheckForm
+#    template
+#    if request.method == 'POST':
+#        form = LocationCheckForm(request.POST)
+
+
+#        if form.is_valid():
+#            print(form.cleaned_data)
+#            loc_chk = form.cleaned_data['loc_to_check']
+#            eq_chk = form.cleaned_data['eq_to_check']
+#            locations = Location.objects.filter(asset_loc=loc_chk).first()
+#            if not locations:
+#                messages.error(request, "{} is not a known location.".format(loc_chk))
+#            else:
+#                pass
+#    return redirect('index') 
+
