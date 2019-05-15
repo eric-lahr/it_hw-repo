@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from assets.models import Category, Location, Department, Equipment, Action, Zone
+ from assets.models import Category, Location, Department, Equipment, Action, Zone
 #from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.views import generic
@@ -104,69 +104,52 @@ class LocationCheckView(generic.FormView):
     success_url = '/assets/quickcheck/'
 
     def form_valid(self, form):
-        at_location = []
-        test = "pass"
-        missing = []
-        in_system = []
-        loc_chk = form.cleaned_data['location']
-        eq_chk = (form.cleaned_data['assets'].split('\r\n'))
-        all_loc = Location.objects.filter(asset_loc=loc_chk).first()
-        eq_at_loc = Equipment.objects.filter(asset_loc=all_loc)
+#        at_location = []
+#        test = "pass"
+#        missing = []
+#        in_system = []
+#        loc_chk = form.cleaned_data['location']
+#        eq_chk = (form.cleaned_data['assets'].split('\r\n'))
+#        all_loc = Location.objects.filter(asset_loc=loc_chk).first()
+#        eq_at_loc = Equipment.objects.filter(asset_loc=all_loc)
+        
+#        for i in eq_at_loc:
+#            in_system.append(str(i))
 
-        for i in eq_at_loc:
-            in_system.append(str(i))
 
-        for p in eq_chk:
-            check = Equipment.objects.filter(name=p).first()
+#        for item in eq_chk:
+#            check = Equipment.objects.filter(name=item).first()
+            
+#            if not check:
+#                messages.error(self.request, "{} is not a valid equipment name".format(item))
+#            else:
+#                x = str(item)
+#                at_location.append(x)
 
-            if not check:
-                messages.error(self.request, "{} is not a valid equipment name.".format(p))
-            else:
-                at_location.append(str(p))
+#        if not all_loc:
+#            messages.error(self.request, "{} is not a valid location".format(loc_chk))
+#            return super(LocationCheckView, self).form_valid(form)
+#        else:
+#            for item in at_location:
+#                if item in in_system:
+#                    messages.success(self.request, "{} belongs at this location.".format(item))
+#                else:
+#                    messages.error(self.request, "{} does not belong here.".format(item))
 
-        if not all_loc:
-            messages.error(self.request, "{} is not valid location.".format(loc_chk))
-            return super(LocationCheckView, self).form_valid(form)
-        else:
-            for item in at_location:
-                if item in in_system:
-                    messages.success(self.request, "{} belongs at this location.".format(item))
-                else:
-                    should_be = Equipment.objects.get(name=item)
-                    print(should_be.asset_loc)
-                    messages.error(self.request,
-                            "{} does not belong here. It should be at {}.".format(item, should_be.asset_loc))
-
-            for item in in_system:
-                if item not in at_location:
-                    messages.error(self.request,
-                        "{} should be at this location but was not in your list.".format(item))
-                    missing.append(item)
-                    test = "fail"
-                else:
-                    continue
-        if test == "pass":
-            messages.success(self.request, "All items that should be at this location are present.")
-        else:
-            messages.error(self.request, "Items are missing from this location!")
-
+#            for item in in_system:
+#                if item not in at_location:
+#                    messages.error(self.request,
+#                        "{} should be at this location but was not in your list.".format(item))
+#                    missing.append(str(item))
+#                    test = "fail"
+#                else:
+#                    continue
+#        if test == "pass":
+#            messages.success(self.request, "All items that should be at this location are present.")
+#        else:
+#            messages.error(self.request, "Items are missing from this location!")
+            
         return super(LocationCheckView, self).form_valid(form)
 
 
-#def LocationCheckView(request):
-#    form = LocationCheckForm
-#    template
-#    if request.method == 'POST':
-#        form = LocationCheckForm(request.POST)
 
-
-#        if form.is_valid():
-#            print(form.cleaned_data)
-#            loc_chk = form.cleaned_data['loc_to_check']
-#            eq_chk = form.cleaned_data['eq_to_check']
-#            locations = Location.objects.filter(asset_loc=loc_chk).first()
-#            if not locations:
-#                messages.error(request, "{} is not a known location.".format(loc_chk))
-#            else:
-#                pass
-#    return redirect('index')

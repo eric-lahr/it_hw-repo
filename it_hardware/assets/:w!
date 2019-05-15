@@ -132,10 +132,10 @@ class LocationCheckView(generic.FormView):
                 if item in in_system:
                     messages.success(self.request, "{} belongs at this location.".format(item))
                 else:
-                    should_be = Equipment.objects.get(name=item)
-                    print(should_be.asset_loc)
+                    should_be = Equipment.objects.filter(name=item).first()
+                    belongs = str(should_be.asset_loc)
                     messages.error(self.request,
-                            "{} does not belong here. It should be at {}.".format(item, should_be.asset_loc))
+                            "{} does not belong here. It should be at {}.".format(item, belongs))
 
             for item in in_system:
                 if item not in at_location:

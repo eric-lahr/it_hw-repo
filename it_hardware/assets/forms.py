@@ -18,10 +18,18 @@ class LocationCheckForm(forms.Form):
                              label="Assets at location")
 
     def clean(self):
-        cleaned_data = super().clean()
-        loc = cleaned_data['location']
-        eq = cleaned_data['assets']
-        print(eq)
-        cleaned_data['loc_to_check'] = loc
-        cleaned_data['e_to_check'] = eq
-        return cleaned_data
+        self.cleaned_data = super().clean()
+#        self.cleaned_data['location'] = 'location'
+#        self.cleaned_data['assets'] = 'assets'
+        return self.cleaned_data
+
+
+
+        
+#        cleaned_data = super().clean()
+#        loc = cleaned_data['location']
+#        eq = cleaned_data['assets']
+#        print(eq)
+#        cleaned_data['loc_to_check'] = loc
+#        cleaned_data['e_to_check'] = eq
+#        return cleaned_data

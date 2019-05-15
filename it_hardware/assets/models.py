@@ -264,9 +264,8 @@ class Action(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('service-detail', args=[str(self.id)])
+        return reverse('service-create', args=[str(self.id)])
 
     class Meta:
         ordering = ['-dt']
         verbose_name_plural = 'service calls'
-

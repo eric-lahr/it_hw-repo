@@ -107,48 +107,40 @@ class LocationCheckView(generic.FormView):
         at_location = []
         test = "pass"
         missing = []
-        in_system = []
         loc_chk = form.cleaned_data['location']
         eq_chk = (form.cleaned_data['assets'].split('\r\n'))
         all_loc = Location.objects.filter(asset_loc=loc_chk).first()
         eq_at_loc = Equipment.objects.filter(asset_loc=all_loc)
+        eq_at_loc = list(eq_at_loc)
+        for item in eq_at_loc:
+            eq_legit = Equipment.objects.filter(name=item).first()
+            if eq_legit:
+                x = str(item)
+                at_location.append(x)
 
-        for i in eq_at_loc:
-            in_system.append(str(i))
+                if not all_loc:
+                    messages.error(self.request, "Location is not valid.")
+                else:
+                    for item in eq_chk:
+                        if item in at_location:
+                            messages.success(self.request, "{} belongs at this location.".format(item))
+                        else:
+                            messages.error(self.request, "{} does not belong here.".format(item))
+                    for item in at_location:
 
-        for p in eq_chk:
-            check = Equipment.objects.filter(name=p).first()
-
-            if not check:
-                messages.error(self.request, "{} is not a valid equipment name.".format(p))
+                        if item not in eq_chk:
+                            messages.error(self.request,
+                                "{} should be at this location but was not in your list.".format(item))
+                            missing.append(item)
+                            test = "fail"
+                        else:
+                            pass
+                if test == "pass":
+                    messages.success(self.request, "All items that should be at this location are present.")
+                else:
+                    messages.error(self.request, "This location is missing {}.".format(missing))
             else:
-                at_location.append(str(p))
-
-        if not all_loc:
-            messages.error(self.request, "{} is not valid location.".format(loc_chk))
-            return super(LocationCheckView, self).form_valid(form)
-        else:
-            for item in at_location:
-                if item in in_system:
-                    messages.success(self.request, "{} belongs at this location.".format(item))
-                else:
-                    should_be = Equipment.objects.get(name=item)
-                    print(should_be.asset_loc)
-                    messages.error(self.request,
-                            "{} does not belong here. It should be at {}.".format(item, should_be.asset_loc))
-
-            for item in in_system:
-                if item not in at_location:
-                    messages.error(self.request,
-                        "{} should be at this location but was not in your list.".format(item))
-                    missing.append(item)
-                    test = "fail"
-                else:
-                    continue
-        if test == "pass":
-            messages.success(self.request, "All items that should be at this location are present.")
-        else:
-            messages.error(self.request, "Items are missing from this location!")
+                messages.error(self.request, "{} is not a valid piece of equipment.".format(item))
 
         return super(LocationCheckView, self).form_valid(form)
 
