@@ -1,12 +1,25 @@
 from django import forms
-from assets.models import Action
+from assets.models import Action, Equipment
 
+
+class EditForm(forms.ModelForm):
+
+    class Meta:
+        model = Equipment
+        fields = ['asset_loc', 'i_date', 'state', 'ip_config', 'ip_address',
+                  'os', 'ram', 'hd', 'bios', 'firm', 'ext']
+
+    def clean(self):
+        self.cleaned_data = super().clean()
+        return self.cleaned_data
+        
 
 class ServiceForm(forms.ModelForm):
 
     class Meta:
         model = Action
         fields = ['incident', 'act_detail', 'result']
+
 
 class LocationCheckForm(forms.Form):
     location = forms.CharField(max_length=15,
@@ -25,7 +38,7 @@ class LocationCheckForm(forms.Form):
 
 
 
-        
+
 #        cleaned_data = super().clean()
 #        loc = cleaned_data['location']
 #        eq = cleaned_data['assets']

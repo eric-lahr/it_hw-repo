@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from datetime import datetime
+from django.core.validators import MinValueValidator
+from model_utils import FieldTracker
 
 # Create your models here.
 
@@ -10,6 +12,10 @@ class Category(models.Model):
             max_length=20,
             unique=True,
             verbose_name='asset category')
+
+    max_allowed = models.IntegerField(
+            default=1,
+            validators=[MinValueValidator(1)])
 
     def __str__(self):
         return "{}".format(self.asset_cat)
@@ -216,6 +222,8 @@ class Equipment(models.Model):
             blank=True,
             default=None,
             verbose_name='image date')
+
+    tracker = FieldTracker()
 
     def __str__(self):
         return "{}".format(self.name)
