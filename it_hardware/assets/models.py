@@ -269,10 +269,10 @@ class Action(models.Model):
             null=True)
 
     def __str__(self):
-        return self.name
+        return self.incident
 
     def get_absolute_url(self):
-        return reverse('service-create', args=[str(self.id)])
+        return reverse('incident-detail', args=[str(self.id)])
 
     class Meta:
         ordering = ['-dt']

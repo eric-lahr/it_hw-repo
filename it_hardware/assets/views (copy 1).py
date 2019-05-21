@@ -17,7 +17,6 @@ def index(request):
     tot_prn = Equipment.objects.filter(asset_cat__asset_cat='Printer').count()
     tot_phn = Equipment.objects.filter(asset_cat__asset_cat='Phone').count()
     tot_mon = Equipment.objects.filter(asset_cat__asset_cat='Monitor').count()
-    dhcp = Equipment.objects.filter(ip_config='DHCP')
     context = {
             'tot_pcs': tot_pcs,
             'tot_prn': tot_prn,
@@ -73,9 +72,6 @@ class EquipmentDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(EquipmentDetailView, self).get_context_data(**kwargs)
-        if str(self.object.ip_config) == 'DHCP':
-            ip_name = str(self.object) + '.vitacost.com'
-            context['ip_addr'] = socket.gethostbyname(ip_name)
         context['equipment_history'] = Action.objects.filter(name=self.object).order_by('dt').reverse()
         return context
 
@@ -99,8 +95,8 @@ class EquipmentEditView(generic.UpdateView):
                     pass
                 else:
                     Action.objects.create(name=self.object, act='CHANGE',
-                        act_detail='IP address changed from {} to {}.'.format(
-                            v, y
+                        act_detail='{} ip address changed from {} to {}.'.format(
+                            n, v, y
                         ), incident = '')
 
             if k == 'state_id':
@@ -121,7 +117,7 @@ class EquipmentEditView(generic.UpdateView):
                         act_detail='Status changed from {} to {}.'.format(
                             str(old_state), str(new_state)
                             ), incident = '')
-
+                    
                 elif str(new_state) == 'deployed':
 
                     if str(current_loc) =='storage':
@@ -218,23 +214,22 @@ class EquipmentEditView(generic.UpdateView):
                 maximum = Category.objects.get(asset_cat=self.object.asset_cat)
 
                 if str(new_loc) == 'storage':
-                    Status_id = Status.objects.get(state='stored')
-                    self.object.state = Status_id
+                    self.object.state = 'stored'
                     self.object.save()
                     Action.objects.create(name=self.object, act='CHANGE',
                         act_detail='Status changed from deployed to stored.',
                                           incident = '')
 
                 elif conflict_count == maximum.max_allowed:
-
+                    
                     if conflict_count > 1:
                         self.object.asset_loc = old_loc
                         self.object.save()
-                        loc_message="""There are already too many {}s at {}.
+                        loc_message="""There are already too many {}s at {}. 
                         Move one of these to storage before you try this move
                         again.""".format(maximum, new_loc)
                         messages.add_message(self.request, messages.ERROR, loc_message)
-
+                        
                     else:
                         x = str(conflict)
                         Location_id = Location.objects.get(asset_loc='storage')
@@ -244,42 +239,24 @@ class EquipmentEditView(generic.UpdateView):
                         to_storage.asset_loc = Location_id
                         to_storage.state = Status_id
                         to_storage.save()
-                        Equipment_id = Equipment.objects.get(name=to_storage.name)
 
-                        Action.objects.create(name=Equipment_id, act='CHANGE',
+                        Action.objects.create(name=to_storage.name, act='CHANGE',
                                               act_detail='Location changed from {} to storage.'.format(
                                                   str(new_loc)
                                                   ), incident = '')
-                        Action.objects.create(name=Equipment_id, act='CHANGE',
+                        Action.objects.create(name=to_storage.name, act='CHANGE',
                                               act_detail='Status changed from deployed to stored.',
                                               incident = '')
                         loc_message="""{} was already at {}. Your move was successful
                         but be aware, {} has been moved to storage.""".format(
                                 to_storage.name, new_loc, to_storage.name)
                         messages.add_message(self.request, messages.WARNING, loc_message)
-
+        
 
                 Action.objects.create(name=self.object, act='CHANGE',
                                       act_detail='Location changed from {} to {}.'.format(
                                           str(old_loc), str(new_loc)), incident = '')
-
-
-                if str(self.object.state) != 'deployed' and str(self.object.asset_loc) != 'storage':
-                    Status_id = Status.objects.get(state='deployed')
-                    self.object.state = Status_id
-                    self.object.save()
-                    Action.objects.create(name=self.object, act='CHANGE',
-                                          act_detail='Status changed to deployed.',
-                                          incident = '')
-
-                elif str(self.object.state) == 'deployed' and str(self.object.asset_loc) == 'storage':
-                    Status_id = Status.objects.get(state='stored')
-                    self.object.state = Status_id
-                    self.object.save()
-                    Action.objects.create(name=self.object, act='CHANGE',
-                                          act_detail='Status changed from deployed to stored.',
-                                          incident = '')
-
+                
 
         return super().form_valid(form)
 
@@ -302,9 +279,6 @@ class EquipmentServiceView(generic.CreateView):
         self.object.act = 'SERVICE'
         self.object.save()
         return super().form_valid(form)
-
-    def get_success_url(self, *args, **kwargs):
-        return reverse('equipment-detail', kwargs={'pk': self.kwargs['equipment_pk']})
 
 
 class LocationCheckView(generic.FormView):
@@ -361,14 +335,6 @@ class LocationCheckView(generic.FormView):
 
         return super(LocationCheckView, self).form_valid(form)
 
-class IncidentDetailView(generic.DetailView):
-    model = Action
-    template_name = 'incident_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(IncidentDetailView, self).get_context_data(**kwargs)
-        context['incident_record'] = Action.objects.filter(id=self.object.id).first()
-        return context
 
 #def LocationCheckView(request):
 #    form = LocationCheckForm

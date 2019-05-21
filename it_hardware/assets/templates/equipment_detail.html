@@ -4,14 +4,22 @@
 {% load staticfiles %}
 
   <h1>{{ equipment.name }}</h1>
-
-  <p><strong>System ID#:</strong> {{ equipment.id }}</p>
-  <p><strong>Name:</strong> {{ equipment.name }}</p>
+  {% if ip_addr %}
+  <p><strong>IP:</strong> {{ ip_addr }}</p>
+  {% endif %}
   <p><strong>Location:</strong> {{ equipment.asset_loc }}</p>
 
   <a class="btn btn-primary" href="{% url 'equipment-edit' object.pk %}" role="button">Edit</a>
   <a class="btn btn-primary" href="{% url 'service-create' object.pk %}" role="button">Service</a>
 
+  {% if messages %}
+  <ul class="messages">
+      {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+  </ul>
+
+  {% endif %}
 
   <h4>History</h4>
 
@@ -28,8 +36,8 @@
 
     <tr>
       <td>{{ row.dt }}</td>
-      <td>{{ row.incident }}</td>
-      <td>{{ row.act_detail }}</td>
+      <td><a href="{{ row.get_absolute_url }}">{{ row.incident|truncatechars:30 }}</a></td>
+      <td>{{ row.act_detail|truncatechars:50 }}</td>
     </tr>
 
     {% endfor %}

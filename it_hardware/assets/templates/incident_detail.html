@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+  <h1>Incident Record</h1>
+  <h4>{{ incident_record.name }}</h4>
+
+  <p>Date and Time: {{ incident_record.dt }}</p>
+
+  <p>Incident:</p>
+
+  {{ incident_record.incident }}
+
+  <p>Action taken:</p>
+
+  {{ incident_record.act_detail }}
+
+  <p>Result:</p>
+
+  {{ incident_record.result }}
+
+  <a class="btn btn-primary" href="{{ request.META.HTTP_REFERER }}" role="button">Back</a>
+
+{% endblock %}
