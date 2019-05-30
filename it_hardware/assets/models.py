@@ -46,7 +46,6 @@ class Location(models.Model):
     asset_loc = models.CharField(
             max_length=20,
             unique=True,
-            default='storage',
             verbose_name='asset location')
 
     zone_loc = models.ForeignKey('zone', default=None, on_delete=models.PROTECT, verbose_name='zone')
@@ -95,6 +94,7 @@ class Status(models.Model):
         return reverse('status-detail', args=[str(self.id)])
 
     class Meta:
+        verbose_name = 'status'
         verbose_name_plural = 'status'
 
 
@@ -104,9 +104,15 @@ class Equipment(models.Model):
             max_length=15,
             unique=True,
             verbose_name='asset name')
-    asset_cat = models.ForeignKey('category',on_delete=models.PROTECT,verbose_name='asset category')
-    asset_loc = models.ForeignKey('location',on_delete=models.PROTECT,verbose_name='asset location')
-    state = models.ForeignKey('status',on_delete=models.PROTECT,verbose_name='status')
+    asset_cat = models.ForeignKey('Category',on_delete=models.PROTECT,verbose_name='asset category')
+    asset_loc = models.ForeignKey('Location',
+                                  on_delete=models.PROTECT,
+                                  verbose_name='asset location',
+                                  default=10)
+    state = models.ForeignKey('Status',
+                              on_delete=models.PROTECT,
+                              verbose_name='status',
+                              default=4)
 
     brand = models.CharField(
             max_length=15,
@@ -133,7 +139,7 @@ class Equipment(models.Model):
             (STATIC, 'STATIC'),
             (NA, 'N/A'),
     )
-
+    
     ip_config = models.CharField(
             max_length=6,
             choices=IP_CONFIG_CHOICES,
@@ -193,11 +199,19 @@ class Equipment(models.Model):
             default=None,
             verbose_name='number of ports')
 
-    ext = models.IntegerField(
+    ext = models.PositiveIntegerField(
             blank=True,
             null=True,
             default=None,
             verbose_name='phone extension')
+
+    phone_num = models.CharField(
+            blank=True,
+            null=True,
+            default=None,
+            max_length=15,
+            unique=False,
+            verbose_name='phone number')
 
     p_date = models.DateField(
             auto_now=False,
@@ -206,6 +220,15 @@ class Equipment(models.Model):
             blank=True,
             default=None,
             verbose_name='purchase date')
+
+    cost = models.DecimalField(
+            max_digits=9,
+            decimal_places=2,
+            blank=True,
+            null=True,
+            default=None,
+            verbose_name='purchase price')
+        
 
     d_date = models.DateField(
             auto_now=False,
@@ -233,7 +256,7 @@ class Equipment(models.Model):
 
     class Meta:
         ordering = ['asset_cat', 'name']
-        verbose_name_plural = 'pieces of equipment'
+        verbose_name_plural = 'equipment'
 
 
 class Action(models.Model):
@@ -241,6 +264,7 @@ class Action(models.Model):
 
     dt = models.DateTimeField(
             auto_now_add=True,
+            null=True,
             verbose_name='date and time of incident')
 
     incident = models.TextField(

@@ -1,5 +1,28 @@
 {% extends "base_generic.html" %}
 
+{% block navbar %}
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'index' %}">Home</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'zones' %}">Zones</a>
+    </li>
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'categories' %}">Assets <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'storage' %}">Storage</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'location-check' %}">Location Check</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'quick-move' %}">Quick Move</a>
+    </li>
+  </ul>
+{% endblock %}
+
 {% block content %}
 {% load staticfiles %}
 
@@ -8,9 +31,37 @@
   <p><strong>IP:</strong> {{ ip_addr }}</p>
   {% endif %}
   <p><strong>Location:</strong> {{ equipment.asset_loc }}</p>
+  <p><strong>Department:</strong> {{ eq_dept }}
+  <p><strong>Category:</strong> {{asset_cat}}
 
   <a class="btn btn-primary" href="{% url 'equipment-edit' object.pk %}" role="button">Edit</a>
   <a class="btn btn-primary" href="{% url 'service-create' object.pk %}" role="button">Service</a>
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEquipmentDetails">Details</button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="modalEquipmentDetails" tabindex="-1" role="dialog" aria-labelledby="modelEquipmentDetailsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLongTitle">{{ equipment.name }} details</h5>
+          <button type="button" class="close" data-dismess="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table summary="equipment_values">
+              <tr><th>Attribute</th><th>Value</th></tr>
+              {% for key, value in obj_dict.items %}
+              <tr><strong><td>{{key}}</td></strong><td>{{value}}</td></tr>
+              {% endfor %}
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   {% if messages %}
   <ul class="messages">
@@ -37,7 +88,7 @@
     <tr>
       <td>{{ row.dt }}</td>
       <td><a href="{{ row.get_absolute_url }}">{{ row.incident|truncatechars:30 }}</a></td>
-      <td>{{ row.act_detail|truncatechars:50 }}</td>
+      <td>{{ row.act_detail|truncatechars:65 }}</td>
     </tr>
 
     {% endfor %}

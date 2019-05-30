@@ -7,22 +7,73 @@ from django.urls import reverse
 from django.urls import reverse_lazy
 from assets.forms import ServiceForm, LocationCheckForm, EditForm
 from django.shortcuts import get_object_or_404
+from datetime import datetime
 import socket
 
 
 # Create your views here.
 
 def index(request):
-    tot_pcs = Equipment.objects.filter(asset_cat__asset_cat='PC').count()
-    tot_prn = Equipment.objects.filter(asset_cat__asset_cat='Printer').count()
-    tot_phn = Equipment.objects.filter(asset_cat__asset_cat='Phone').count()
-    tot_mon = Equipment.objects.filter(asset_cat__asset_cat='Monitor').count()
-    dhcp = Equipment.objects.filter(ip_config='DHCP')
+    cat_dict = {}
+    zone_dict = {}
+    dept_dict = {}
+    eq_tot = Equipment.objects.all().count()
+    cats = Category.objects.all()
+    for cat in cats:
+        val = Equipment.objects.filter(asset_cat__asset_cat=cat).count()
+        cat_dict[cat] = val
+
+    zones = Zone.objects.all()
+    for z in zones:
+        tot_count = 0
+        if str(z) == 'storage':
+            continue
+        locs_in_z = Location.objects.filter(zone_loc__zone_loc=z)
+        for l in locs_in_z:
+            eq_in_loc = Equipment.objects.filter(asset_loc__asset_loc=l).count()
+            tot_count += eq_in_loc
+        zone_dict[z] = tot_count
+
+    depts = Department.objects.all()
+    for d in depts:
+        tot_count = 0
+        if str(d) == 'none':
+            continue
+        locs_in_dept = Location.objects.filter(dept__dept=d)
+        for lct in locs_in_dept:
+            if str(lct) == 'storage':
+                continue
+            eq_at_loc = Equipment.objects.filter(asset_loc__asset_loc=lct).count()
+            tot_count += eq_at_loc
+        dept_dict[d] = tot_count
+    store_locs = Location.objects.filter(zone_loc__zone_loc='storage')
+    store = Equipment.objects.filter(asset_loc__in=store_locs)
+    store_count = len(store)
+    cat_list = []
+    store_dict = {}
+    for eq in store:
+        cat_list.append(str(eq.asset_cat))
+    cats_in_store = set((cat_list))
+    for c in cats_in_store:
+        cat_count = Equipment.objects.filter(asset_loc__asset_loc='storage',
+                                 asset_cat__asset_cat=c).count()
+        store_dict[c] = cat_count
+
+    dhcp = Equipment.objects.filter(ip_config='DHCP').exclude(asset_loc__in=store_locs)
+
+    for eq in dhcp:
+        ip_name = str(eq) + '.vitacost.com'
+        ipaddr = socket.gethostbyname(ip_name)
+        t = Equipment.objects.get(name=eq)
+        t.ip_address = ipaddr
+        t.save()
     context = {
-            'tot_pcs': tot_pcs,
-            'tot_prn': tot_prn,
-            'tot_phn': tot_phn,
-            'tot_mon': tot_mon,
+            'cat_dict': cat_dict,
+            'zone_dict': zone_dict,
+            'dept_dict': dept_dict,
+            'eq_tot': eq_tot,
+            'store_dict': store_dict,
+            'store_count': store_count,
 }
 
     return render(request, 'index.html', context=context)
@@ -67,16 +118,81 @@ class CategoryDetailView(generic.DetailView):
         context['cat_eq'] = Equipment.objects.filter(asset_cat=self.object)
         return context
 
+class StorageListView(generic.ListView):
+    context_object_name = 'storage_list'
+    store_zone = Location.objects.filter(zone_loc__zone_loc='storage')
+    queryset = Equipment.objects.filter(asset_loc__in=store_zone).order_by('asset_cat')
+    template_name = 'storage_list.html'
+
+
 class EquipmentDetailView(generic.DetailView):
     model = Equipment
     template_name = 'equipment_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(EquipmentDetailView, self).get_context_data(**kwargs)
+        field_values = {}
+        no_value = ['None', 'none', '', ' ']
+        remove = []
         if str(self.object.ip_config) == 'DHCP':
             ip_name = str(self.object) + '.vitacost.com'
             context['ip_addr'] = socket.gethostbyname(ip_name)
+        loc = Location.objects.get(asset_loc=self.object.asset_loc)
+        context['eq_dept'] = loc.dept
         context['equipment_history'] = Action.objects.filter(name=self.object).order_by('dt').reverse()
+        context['asset_cat'] = self.object.asset_cat
+#        eq_fields = [f.get_attname() for f in Equipment._meta.fields]
+        obj_dict = Equipment.objects.filter(pk=self.object.pk).values()[0]
+        del obj_dict['asset_cat_id'], obj_dict['id'], obj_dict['asset_loc_id'], obj_dict['state_id'], obj_dict['name']
+
+        for key, value in obj_dict.items():
+            if str(value) in no_value:
+                remove.append(key)
+        for i in remove:
+            del obj_dict[i]
+        for key, value in obj_dict.items():
+
+            if str(key) == 'ip_config':
+                old = str(value)
+                del obj_dict['ip_config']
+                obj_dict['ip configuration'] = old
+            if str(key) == 'ip_address':
+                old = str(value)
+                del obj_dict['ip_address']
+                obj_dict['ip address'] = old
+            if str(key) == 'serial':
+                old = str(value)
+                del obj_dict['serial']
+                obj_dict['serial number'] = old
+            if str(key) == 'pro':
+                old = str(value)
+                del obj_dict['pro']
+                obj_dict['processor'] = old
+            if str(key) == 'firm':
+                old = str(value)
+                del obj_dict['firm']
+                obj_dict['firmware'] = old
+            if str(key) == 'ext':
+                old = str(value)
+                del obj_dict['ext']
+                obj_dict['extension'] = old
+            if str(key) == 'p_date':
+                old = str(value)
+                del obj_dict['p_date']
+                obj_dict['purchase date'] = old
+            if str(key) == 'd_date':
+                old = str(value)
+                del obj_dict['d_date']
+                obj_dict['deployment date'] = old
+            if str(key) == 'i_date':
+                old = str(value)
+                del obj_dict['i_date']
+                obj_dict['image date'] = old
+
+
+        context['obj_dict'] = obj_dict
+#        print(obj_dict)
+#        print(field_values)
         return context
 
 
@@ -85,9 +201,12 @@ class EquipmentEditView(generic.UpdateView):
     template_name = 'equipment_edit.html'
     queryset = Equipment.objects.all()
 
+
     def form_valid(self, form):
         self.object = form.save(commit=False)
+        img = (self.request.POST['i_date'])
         changes = self.object.tracker.changed()
+        #store_zone = Location.objects.filter(zone_loc__zone_loc='storage')
         for key, value in changes.items():
             k = str(key)
             v = str(value)
@@ -103,13 +222,25 @@ class EquipmentEditView(generic.UpdateView):
                             v, y
                         ), incident = '')
 
+            if k == 'i_date':
+                print(v)
+                if img != '':
+                    new_image = Action.objects.create(name=self.object, act='CHANGE',
+                                                      incident = '',
+                                                      act_detail='Imaged. Fresh operating system instance applied.')
+                    just_created = Action.objects.get(pk=new_image.pk)
+                    just_created.dt = self.request.POST['i_date']
+                    just_created.save(update_fields=["dt"])
+
+
             if k == 'state_id':
                 new_state = self.object.state
                 old_state = Status.objects.get(pk=v)
+
                 current_loc = self.object.asset_loc
                 if str(old_state) == 'deployed':
-
-                    if str(current_loc) != 'storage':
+                    if current_loc not in Location.objects.filter(zone_loc__zone_loc='storage'):
+                    #if str(current_loc) != 'storage':
                         self.object.state = old_state
                         self.object.save()
                         loc_message = """{} is not in storage. You must change
@@ -124,7 +255,8 @@ class EquipmentEditView(generic.UpdateView):
 
                 elif str(new_state) == 'deployed':
 
-                    if str(current_loc) =='storage':
+                    if current_loc in Location.objects.filter(zone_loc__zone_loc='storage'):
+                    #if str(current_loc) =='storage':
                         self.object.state = old_state
                         self.object.save()
                         loc_message = """{} is in storage. To change it's status to
@@ -138,7 +270,8 @@ class EquipmentEditView(generic.UpdateView):
 
                 elif str(new_state) == 'stored':
 
-                    if str(current_loc) != 'storage':
+                    if current_loc not in Location.objects.filter(zone_loc__zone_loc='storage'):
+                    #if str(current_loc) != 'storage':
                         self.object.state = old_state
                         self.object.save()
                         loc_message = """{} is not in the storage location. Move {} to
@@ -206,7 +339,7 @@ class EquipmentEditView(generic.UpdateView):
                 Action.objects.create(name=self.object, act='CHANGE',
                     act_detail='Extension changed from {} to {}.'.format(
                         v, str(new_ext)
-                    ))
+                    ), incident = '')
 
             if k == 'asset_loc_id':
                 new_loc = self.object.asset_loc
@@ -217,13 +350,14 @@ class EquipmentEditView(generic.UpdateView):
                     asset_cat=self.object.asset_cat).count()
                 maximum = Category.objects.get(asset_cat=self.object.asset_cat)
 
-                if str(new_loc) == 'storage':
+                if new_loc in Location.objects.filter(zone_loc__zone_loc='storage'):
                     Status_id = Status.objects.get(state='stored')
                     self.object.state = Status_id
                     self.object.save()
-                    Action.objects.create(name=self.object, act='CHANGE',
+                    if old_loc not in Location.objects.filter(zone_loc__zone_loc='storage'):
+                        Action.objects.create(name=self.object, act='CHANGE',
                         act_detail='Status changed from deployed to stored.',
-                                          incident = '')
+                        incident = '')
 
                 elif conflict_count == maximum.max_allowed:
 
@@ -263,16 +397,23 @@ class EquipmentEditView(generic.UpdateView):
                                       act_detail='Location changed from {} to {}.'.format(
                                           str(old_loc), str(new_loc)), incident = '')
 
-
-                if str(self.object.state) != 'deployed' and str(self.object.asset_loc) != 'storage':
+                #if current_loc in Location.objects.filter(zone_loc__zone_loc='storage'):
+                if (
+                   str(self.object.state) != 'deployed' and
+                   self.object.asset_loc not in Location.objects.filter(zone_loc__zone_loc='storage')
+                   ):
                     Status_id = Status.objects.get(state='deployed')
                     self.object.state = Status_id
+                    self.object.d_date = datetime.now()
                     self.object.save()
                     Action.objects.create(name=self.object, act='CHANGE',
                                           act_detail='Status changed to deployed.',
                                           incident = '')
 
-                elif str(self.object.state) == 'deployed' and str(self.object.asset_loc) == 'storage':
+                elif (
+                    str(self.object.state) == 'deployed' and
+                    self.object.asset_loc in Location.objects.filter(zone_loc__zone_loc='storage')
+                    ):
                     Status_id = Status.objects.get(state='stored')
                     self.object.state = Status_id
                     self.object.save()
@@ -305,6 +446,149 @@ class EquipmentServiceView(generic.CreateView):
 
     def get_success_url(self, *args, **kwargs):
         return reverse('equipment-detail', kwargs={'pk': self.kwargs['equipment_pk']})
+
+class QuickMoveView(generic.FormView):
+    form_class = LocationCheckForm
+    template_name = 'quick_move.html'
+    success_url = '/assets/quickmove/'
+
+    def form_valid(self, form):
+        new_loc = form.cleaned_data['location']
+        move_eq = (form.cleaned_data['assets'].split('\r\n'))
+        valid_loc = Location.objects.filter(asset_loc=new_loc).first()
+        new_loc_rec = Location.objects.get(asset_loc=new_loc)
+
+        if not valid_loc:
+            messages.error(self.request, "{} is not a valid location.".format(new_loc))
+        else:
+            remove = []
+            for eq_mv in move_eq:
+                valid_eq = Equipment.objects.filter(name=eq_mv).first()
+                if not valid_eq:
+                    move_message = "{} is not a valid equipment name.".format(eq_mv)
+                    messages.add_message(self.request, messages.ERROR, move_message)
+                    remove.append(eq_mv)
+
+            for move_try in move_eq:
+                if move_try in remove:
+                    continue
+                move_try_rec = Equipment.objects.get(name=move_try)
+
+                old_loc = str(move_try_rec.asset_loc)
+                if old_loc == new_loc:
+                    move_message = "{} is already at {}.".format(move_try, new_loc)
+                    messages.add_message(self.request, messages.ERROR, move_message)
+                    remove.append(move_try)
+                else:
+                    #Category_id = Category.objects.get(asset_cat=move_try_rec.asset_cat)
+                    #Location_id = Location.objects.get(asset_loc=move_try_rec.asset_loc)
+
+                    conflict = Equipment.objects.filter(asset_loc_id=new_loc_rec.id,
+                                                        asset_cat_id=move_try_rec.asset_cat_id)
+                    conflict_count = conflict.count()
+                    #conflict_count = Equipment.objects.filter(asset_loc_id=new_loc_rec.id,
+                   #                                          asset_cat_id=move_try_rec.asset_cat_id).count()
+                    maximum = Category.objects.get(id=move_try_rec.asset_cat_id)
+                    Status_id = Status.objects.get(state='stored')
+                    Location_id = Location.objects.get(asset_loc='storage')
+                    #Equipment_id = Equipment.objects.get(name=move_try_rec.name)
+                    if new_loc in Location.objects.filter(zone_loc__zone_loc='storage'):
+                        move_try_rec.state = Status_id
+                        move_try_rec.asset_loc = Location_id
+                        move_try_rec.save()
+                        move_message = "Location changed from {} to {}.".format(
+                            old_loc, new_loc)
+                        Action.objects.create(name_id=move_try_rec.id, act='CHANGE',
+                                              act_detail=move_message, incident = '')
+                        display_message = "{} successfully moved from {} to {}.".format(
+                            move_try_rec.name, old_loc, new_loc)
+                        messages.add_message(self.request, messages.SUCCESS, display_message)
+
+                    elif conflict_count == maximum.max_allowed:
+
+                        if conflict_count > 1:
+                            move_message="""There are already too many {}s at {}.
+                            Move one of these to storage before you try this move
+                            again.""".format(maximum, new_loc)
+                            messages.add_message(self.request, messages.ERROR, move_message)
+
+                        else:
+                            x = str(conflict)
+                            new_loc_rec = Location.objects.get(asset_loc=new_loc)
+                            to_storage = Equipment.objects.get(asset_loc_id=new_loc_rec.id,
+                                                               asset_cat_id=move_try_rec.asset_cat_id)
+                            to_storage.asset_loc = Location_id
+                            to_storage.state = Status_id
+                            to_storage.save()
+                            #Equipment_id = Equipment.objects.get(name=to_storage.name)
+                            Action.objects.create(name_id=to_storage.id, act='CHANGE',
+                                                  act_detail='Location changed from {} to storage.'.format(
+                                                      str(new_loc)),
+                                                  incident = '')
+                            Action.objects.create(name_id=to_storage.id, act='CHANGE',
+                                                  act_detail='Status changed from deployed to stored.',
+                                                  incident = '')
+                            move_message="""{} was already at {}. Your move was successful
+                            but be aware, {} has been moved to storage.""".format(
+                                to_storage.name, new_loc, to_storage.name)
+                            messages.add_message(self.request, messages.WARNING, move_message)
+
+                            Action.objects.create(name_id=move_try_rec.id,
+                                                  act='CHANGE',
+                                                  act_detail='Location changed from {} to {}.'.format(
+                                                      str(old_loc), str(new_loc)),
+                                                  incident = '')
+                            move_message = """{} successfully moved from {} to {}.""".format(
+                                move_try,str(old_loc),str(new_loc))
+                            messages.add_message(self.request, messages.SUCCESS, move_message)
+                            if move_try_rec.asset_loc in Location.objects.filter(zone_loc__zone_loc='storage'):
+                                move_try_rec.d_date = datetime.now()
+                                move_try_rec.save(update_fields=['d_date'])
+                            new = Location.objects.get(asset_loc=new_loc)
+                            move_try_rec.asset_loc_id = new.id
+                            move_try_rec.save(update_fields=["asset_loc"])
+
+                    else:
+
+                        Action.objects.create(name_id=move_try_rec.id,
+                                              act='CHANGE',
+                                              act_detail='Location changed from {} to {}.'.format(
+                                                  str(old_loc), str(new_loc)),
+                                              incident = '')
+                        move_message = """{} successfully moved from {} to {}.""".format(
+                            move_try,str(old_loc),str(new_loc))
+                        messages.add_message(self.request, messages.SUCCESS, move_message)
+                        new = Location.objects.get(asset_loc=new_loc)
+                        move_try_rec.asset_loc_id = new.id
+                        move_try_rec.save(update_fields=["asset_loc"])
+
+                    #in Location.objects.filter(zone_loc__zone_loc='storage'):
+                    if (
+                        str(move_try_rec.state) != 'deployed' and
+                        move_try_rec.asset_loc not in Location.objects.filter(zone_loc__zone_loc='storage')
+                        ):
+                        Status_id = Status.objects.get(state='deployed')
+                        move_try_rec.state_id = Status_id
+                        move_try_rec.d_date = datetime.now()
+                        move_try_rec.save()
+                        Action.objects.create(name_id=move_try_rec.id,
+                                              act='CHANGE',
+                                              act_detail='Status changed to deployed.',
+                                              incident = '')
+
+                    elif (
+                        str(move_try_rec.state) == 'deployed' and
+                        move_try_rec.asset_loc in Location.objects.filter(zone_loc__zone_loc='storage')
+                        ):
+                        Status_id = Status.objects.get(state='stored')
+                        move_try_rec.state_id = Status_id
+                        move_try_rec.save()
+                        Action.objects.create(name_id=move_try_rec.id,
+                                              act='CHANGE',
+                                              act_detail='Status changed from deployed to stored.',
+                                              incident = '')
+
+        return super().form_valid(form)
 
 
 class LocationCheckView(generic.FormView):
@@ -369,21 +653,3 @@ class IncidentDetailView(generic.DetailView):
         context = super(IncidentDetailView, self).get_context_data(**kwargs)
         context['incident_record'] = Action.objects.filter(id=self.object.id).first()
         return context
-
-#def LocationCheckView(request):
-#    form = LocationCheckForm
-#    template
-#    if request.method == 'POST':
-#        form = LocationCheckForm(request.POST)
-
-
-#        if form.is_valid():
-#            print(form.cleaned_data)
-#            loc_chk = form.cleaned_data['loc_to_check']
-#            eq_chk = form.cleaned_data['eq_to_check']
-#            locations = Location.objects.filter(asset_loc=loc_chk).first()
-#            if not locations:
-#                messages.error(request, "{} is not a known location.".format(loc_chk))
-#            else:
-#                pass
-#    return redirect('index')

@@ -1,13 +1,19 @@
 from django import forms
 from assets.models import Action, Equipment
+from django.contrib.admin.widgets import AdminDateWidget
 
-
+class DateTimeInput(forms.DateTimeInput):
+    input_type = 'date'
+    
 class EditForm(forms.ModelForm):
 
     class Meta:
         model = Equipment
         fields = ['asset_loc', 'i_date', 'state', 'ip_config', 'ip_address',
                   'os', 'ram', 'hd', 'bios', 'firm', 'ext']
+        widgets = {
+            'i_date': DateTimeInput()
+            }
 
     def clean(self):
         self.cleaned_data = super().clean()
@@ -28,7 +34,7 @@ class LocationCheckForm(forms.Form):
 
     assets = forms.CharField(widget=forms.Textarea,
                              required=True,
-                             label="Assets at location")
+                             label="Assets")
 
     def clean(self):
         self.cleaned_data = super().clean()

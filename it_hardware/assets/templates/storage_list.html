@@ -5,14 +5,14 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'index' %}">Home</a>
     </li>
-    <li class="nav-item active">
-      <a class="nav-link" href="{% url 'zones' %}">Zones <span class="sr-only">(current)</span></a>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'zones' %}">Zones</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="{% url 'categories' %}">Assets</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'storage' %}">Storage</a>
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'storage' %}">Storage <span class="sr-only">(current)</span></a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="{% url 'location-check' %}">Location Check</a>
@@ -24,22 +24,16 @@
 {% endblock %}
 
 {% block content %}
-{% load staticfiles %}
-
-  <h1>{{ location.asset_loc }}</h1>
-
-  <p>This location has <strong>{{ loc_tot }}</strong> assets.</p>
-
-  {% if loc_eq %}
+  <h1>Assets in Storage</h1>
+  {% if storage_list %}
   <ul>
-      {% for asset in loc_eq %}
+      {% for asset in storage_list %}
         <li>
-            <a href="{{ asset.get_absolute_url }}">{{ asset.name }}</a>({{ asset.asset_cat }})
+            <a href="{{ asset.get_absolute_url }}">{{ asset }}</a>{{ asset.asset_cat }}{{asset.asset_loc}}
         </li>
       {% endfor %}
   </ul>
   {% else %}
-    <p>This location has no assets assiged to it.</p>
+    <p>There are no assets in storage.</p>
   {% endif %}
-
 {% endblock %}

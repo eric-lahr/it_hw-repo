@@ -5,8 +5,8 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'index' %}">Home</a>
     </li>
-    <li class="nav-item active">
-      <a class="nav-link" href="{% url 'zones' %}">Zones <span class="sr-only">(current)</span></a>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'zones' %}">Zones</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="{% url 'categories' %}">Assets</a>
@@ -17,8 +17,8 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'location-check' %}">Location Check</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'quick-move' %}">Quick Move</a>
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'quick-move' %}">Quick Move <span class="sr-only">(current)</span></a>
     </li>
   </ul>
 {% endblock %}
@@ -26,20 +26,26 @@
 {% block content %}
 {% load staticfiles %}
 
-  <h1>{{ location.asset_loc }}</h1>
+<h3>Quick Move</h3>
 
-  <p>This location has <strong>{{ loc_tot }}</strong> assets.</p>
+<p>Add the new location and the assets you would like to move.</p>
 
-  {% if loc_eq %}
-  <ul>
-      {% for asset in loc_eq %}
-        <li>
-            <a href="{{ asset.get_absolute_url }}">{{ asset.name }}</a>({{ asset.asset_cat }})
-        </li>
-      {% endfor %}
+  <form action='.' method="POST">
+
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <input class="btn btn-primary" type="submit" value="Submit">
+  </form>
+
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li class="{{ message.tags}}">{{ message }}</li>
+    {% endfor %}
   </ul>
-  {% else %}
-    <p>This location has no assets assiged to it.</p>
   {% endif %}
+
 
 {% endblock %}

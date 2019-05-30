@@ -1,5 +1,28 @@
 {% extends "base_generic.html" %}
 
+{% block navbar %}
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'index' %}">Home</a>
+    </li>
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'zones' %}">Zones <span class="sr-only">(current)</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'categories' %}">Assets <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'storage' %}">Storage</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'location-check' %}">Location Check</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'quick-move' %}">Quick Move</a>
+    </li>
+  </ul>
+{% endblock %}
+
 {% block content %}
   <h1>Zone List</h1>
   {% if zone_list %}

@@ -1,0 +1,21 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+  <h1>{{ category }}</h1>
+
+  <p>{{ category }}s in storage.</p>
+
+  {% if storage_eq %}
+  <ul>
+      {% for asset in storage_eq %}
+        <li>
+            <a href="{{ asset.get_absolute_url }}">{{ asset.name }}</a>
+        </li>
+      {% endfor %}
+  </ul>
+  {% else %}
+  <p>No {{ category }}s in storage.</p>
+  {% endif %}
+{% endblock %}

@@ -1,5 +1,13 @@
-.sidebar-nav {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
+.jumbotron {
+  position: relative;
+  overflow: hidden;
+  background-color: light-gray;
+  text-align: center;
+  padding-bottom: 40px;
+  padding-top: 40px;
+}
+
+.navbar {
+  margin: 10px;
+  background-image: linear-gradient(to right, #0076b7, #203a74);
 }

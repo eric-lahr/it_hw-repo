@@ -1,14 +1,77 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h1>I.T. Inventory System</h1>
-  <p>Inventory Home Page</p>
-  <h2>Dynamic content</h2>
-  <p>The inventory has the following recoed counts:</p>
-  <ul>
-    <li><strong>PCs:</strong> {{ tot_pcs }}</li>
-    <li><strong>Printers:</strong> {{ tot_prn }}</li>
-    <li><strong>Phones:</strong> {{ tot_phn }}</li>
-    <li><strong>Monitors:</strong> {{ tot_mon }}</li>
-  </ul>
+<div class="container">
+  <div class="jumbotron">
+    <h1 class="display-4">I.T. Inventory System</h1>
+    <p class="lead">Inventory Home Page</p>
+    <hr class="my-1">
+    <p>Currently monitoring {{ eq_tot }} pieces of equipment</p>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <p class="lead">Equipment Distribution</p>
+<div class="container">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <p>by Category</p>
+    </div>
+    <div class="col-sm center-block text-center">
+      <p>by Zone</p>
+    </div>
+    <div class="col-sm center-block text-center">
+      <p>by Department</p>
+    </div>
+    <div class="col-sm center-block text-center">
+      <p>in Storage</p>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <table class="table table-bordered" summary="categories_values">
+        <thead class="thead-light">
+          <tr><th>Categories</th><th>Total</th></tr>
+        </thead>
+          {% for key, value in cat_dict.items %}
+          <tr><td>{{key}}</td><td>{{value}}</td></tr>
+          {% endfor %}
+      </table>
+    </div>
+    <div class="col-sm">
+      <table class="table table-bordered" summary="zones_values">
+        <thead class="thead-light">
+          <tr><th>Zones</th><th>Total</th></tr>
+        </thead>
+          {% for key, value in zone_dict.items %}
+          <tr><td>{{key}}</td><td>{{value}}</td></tr>
+          {% endfor %}
+      </table>
+    </div>
+    <div class="col-sm">
+      <table class="table table-bordered" summary="departments_values">
+        <thead class="thead-light">
+          <tr><th>Departments</th><th>Total</th></tr>
+        </thead>
+          {% for key, value in dept_dict.items %}
+          <tr><td>{{key}}</td><td>{{value}}</td></tr>
+          {% endfor %}
+      </table>
+    </div>
+    <div class="col-sm">
+      <table class="table table-bordered" summary="storage_categories">
+        <thead class="thead-light">
+          <tr><th>Storage<sup></sup></th><th>Total</th></tr>
+        </thead>
+          {% for key, value in store_dict.items %}
+          <tr><td>{{key}}</td><td>{{value}}</td></tr>
+          {% endfor %}
+          <tr><td>Total</td><td>{{store_count}}</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
 {% endblock %}
