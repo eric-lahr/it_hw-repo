@@ -2,76 +2,110 @@
 
 {% block content %}
 <div class="container">
-  <div class="jumbotron">
-    <h1 class="display-4">I.T. Inventory System</h1>
-    <p class="lead">Inventory Home Page</p>
+  <div class="jumbotron" id="mainpage">
+    <h1 class="display-4" id="main-title">I.T. Inventory System</h1>
+    <p class="lead" id="main-title-sub">Inventory Home Page</p>
     <hr class="my-1">
-    <p>Currently monitoring {{ eq_tot }} pieces of equipment</p>
+     <p>Currently monitoring {{ eq_tot }} pieces of equipment in {{ loc_tot }} locations</p>
   </div>
 </div>
-<div class="container">
-  <div class="row">
-    <div class="col-sm center-block text-center">
-      <p class="lead">Equipment Distribution</p>
-<div class="container">
-  <div class="row">
-    <div class="col-sm center-block text-center">
-      <p>by Category</p>
+
+  {% if searching %}
+    <div class="container" id="zone_list_head">
+      <div class="row">
+        <div class="col-sm center-block text-center">
+          <h2>Search Results</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm center-block text-center">
+          <p class="lead">Displaying <strong>{{ searching|length }}</strong> results.</p>
+        </div>
+      </div>
     </div>
-    <div class="col-sm center-block text-center">
-      <p>by Zone</p>
-    </div>
-    <div class="col-sm center-block text-center">
-      <p>by Department</p>
-    </div>
-    <div class="col-sm center-block text-center">
-      <p>in Storage</p>
-    </div>
-  </div>
-</div>
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <table class="table table-bordered" summary="categories_values">
-        <thead class="thead-light">
-          <tr><th>Categories</th><th>Total</th></tr>
-        </thead>
-          {% for key, value in cat_dict.items %}
-          <tr><td>{{key}}</td><td>{{value}}</td></tr>
+
+    <div class="container" id="search_reults">
+      <div class="row">
+        <div class="col-sm center-block text-center">
+          <ul>
+          {% for element in searching %}
+            <li><a href="{{ element.get_absolute_url }}">{{element}}</a></li>
           {% endfor %}
-      </table>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="col-sm">
-      <table class="table table-bordered" summary="zones_values">
-        <thead class="thead-light">
-          <tr><th>Zones</th><th>Total</th></tr>
-        </thead>
-          {% for key, value in zone_dict.items %}
-          <tr><td>{{key}}</td><td>{{value}}</td></tr>
-          {% endfor %}
-      </table>
+
+  {% else %}
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm center-block text-center">
+          <h3 id="distribution">Equipment Distribution</h3>
+        </div>
+      </div>
     </div>
-    <div class="col-sm">
-      <table class="table table-bordered" summary="departments_values">
-        <thead class="thead-light">
-          <tr><th>Departments</th><th>Total</th></tr>
-        </thead>
-          {% for key, value in dept_dict.items %}
-          <tr><td>{{key}}</td><td>{{value}}</td></tr>
-          {% endfor %}
-      </table>
+    <div class="container">
+      <div class="row" id="distro-by">
+        <div class="col-sm center-block text-center">
+          <p>by Category</p>
+        </div>
+        <div class="col-sm center-block text-center">
+          <p>by Zone</p>
+        </div>
+        <div class="col-sm center-block text-center">
+          <p>by Department</p>
+        </div>
+        <div class="col-sm center-block text-center">
+          <p>in Storage</p>
+        </div>
+      </div>
     </div>
-    <div class="col-sm">
-      <table class="table table-bordered" summary="storage_categories">
-        <thead class="thead-light">
-          <tr><th>Storage<sup></sup></th><th>Total</th></tr>
-        </thead>
-          {% for key, value in store_dict.items %}
-          <tr><td>{{key}}</td><td>{{value}}</td></tr>
-          {% endfor %}
-          <tr><td>Total</td><td>{{store_count}}</td></tr>
-      </table>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm">
+          <table class="table table-bordered table-hover" summary="categories_values">
+            <thead class="thead-light">
+              <tr><th>Categories</th><th>Total</th></tr>
+            </thead>
+              {% for key, value in cat_dict.items %}
+              <tr><td>{{key}}</td><td>{{value}}</td></tr>
+              {% endfor %}
+          </table>
+        </div>
+        <div class="col-sm">
+          <table class="table table-bordered table-hover" summary="zones_values">
+            <thead class="thead-light">
+              <tr><th>Zones</th><th>Total</th></tr>
+            </thead>
+              {% for key, value in zone_dict.items %}
+              <tr><td>{{key}}</td><td>{{value}}</td></tr>
+              {% endfor %}
+          </table>
+        </div>
+        <div class="col-sm">
+          <table class="table table-bordered table-hover" summary="departments_values">
+            <thead class="thead-light">
+              <tr><th>Departments</th><th>Total</th></tr>
+            </thead>
+              {% for key, value in dept_dict.items %}
+              <tr><td>{{key}}</td><td>{{value}}</td></tr>
+              {% endfor %}
+          </table>
+        </div>
+        <div class="col-sm">
+          <table class="table table-bordered table-hover" summary="storage_categories">
+            <thead class="thead-light">
+              <tr><th>Storage<sup></sup></th><th>Total</th></tr>
+            </thead>
+              {% for key, value in store_dict.items %}
+              <tr><td>{{key}}</td><td>{{value}}</td></tr>
+              {% endfor %}
+              <tr><td>Total</td><td>{{store_count}}</td></tr>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  {% endif %}
 {% endblock %}

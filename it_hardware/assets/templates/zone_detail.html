@@ -25,20 +25,48 @@
 
 {% block content %}
 {% load staticfiles %}
+<div class="container" id="zone_list_head">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <h2>{{ zone.zone_loc }}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <p>This zone has <strong>{{ loc_num }}</strong> locations.</p>
+    </div>
+  </div>
+</div>
 
-  <h1>{{ zone.zone_loc }}</h1>
-
-  <p>This zone has <strong>{{ loc_num }}</strong> locations.</p>
-
-  {% if loc_list %}
-  <ul>
-      {% for location in loc_list %}
-        <li>
-            <a href="{{ location.get_absolute_url }}">{{ location.asset_loc }}</a>
-        </li>
+  {% if loc_dict %}
+  <div class="container">
+    <div class="card-deck">
+      {% for key, value in loc_dict.items %}
+      <div class="col-md-3">
+        <div class="card" id="zn_detail_cards">
+          <div class="card-header">
+            <a id="card-title" href="{{ key.get_absolute_url }}">{{ key }}</a>
+          </div>
+          <div class="card-body">
+            {% for i in value %}
+              <a href="{{ i.get_absolute_url }}">{{ i }}</a>  {{ i.asset_cat }}
+              <br>
+            {% endfor %}
+          </div>
+          <div class"card-footer">
+            <div class="row justify-content-center">
+              <div class="col-10">
+                <small class="text-muted float-right">{{ key.dept }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {% endfor %}
-  </ul>
+    </div>
+  </div>
   {% else %}
     <p>No locations to display.</p>
   {% endif %}
+
 {% endblock %}

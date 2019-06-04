@@ -23,15 +23,31 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Asset Categories</h1>
-  {% if category_list %}
-  <ul>
-      {% for category in category_list %}
-        <li>
-            <a href="{{ category.get_absolute_url }}">{{ category.asset_cat }}</a>
-        </li>
-      {% endfor %}
-  </ul>
+<div class="container" id="zone_list_head">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <h2>Equipment Category List</h2>
+    </div>
+  </div>
+</div>
+
+{% if cat_info %}
+<div class="container">
+  <div class="card-deck">
+    {% for key, value in cat_info.items %}
+    <div class="col-md-3">
+      <div class="card mt-3">
+        <div class="card-header">
+          <a id="card-title" href="{{ key.get_absolute_url }}">{{ key }}</a>
+        </div>
+        <div class="card-body">
+          <p>Total {{ key }}s: {{ value }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
   {% else %}
     <p>There are no asset categories in the system.</p>
   {% endif %}

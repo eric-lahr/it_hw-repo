@@ -1,19 +1,94 @@
 {% extends "base_generic.html" %}
 
+{% block navbar %}
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'index' %}">Home</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'zones' %}">Zones</a>
+    </li>
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'categories' %}">Assets <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'storage' %}">Storage</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'location-check' %}">Location Check</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'quick-move' %}">Quick Move</a>
+    </li>
+  </ul>
+{% endblock %}
+
 {% block content %}
 {% load staticfiles %}
-  <h1>{{ equipment.name }}</h1>
+{% load crispy_forms_tags %}
 
-  <p><strong>Location:</strong> {{ equipment.asset_loc }}</p>
+<div class="container">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <h4>{{ equipment.name }}</h4>
+    </div>
+  </div>
+</div>
 
-  <form method="post">
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-10">
+      <hr class="mt-0 mb-4">
+      <form method="post">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-4">
+            {{ form.asset_loc|as_crispy_field }}
+          </div>
+          <div class="col-4">
+            {{ form.i_date|as_crispy_field }}
+          </div>
+          <div class="col-4">
+            {{ form.state|as_crispy_field }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            {{ form.ip_config|as_crispy_field }}
+          </div>
+          <div class="col-4">
+            {{ form.ip_address|as_crispy_field }}
+          </div><div class="col-4"></div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            {{ form.os|as_crispy_field }}
+          </div>
+          <div class="col-4">
+            {{ form.ram|as_crispy_field }}
+          </div>
+          <div class="col-4">
+            {{ form.hd|as_crispy_field }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            {{ form.bios|as_crispy_field }}
+          </div>
+          <div class="col-4">
+            {{ form.firm|as_crispy_field }}
+          </div><div class="col-4"></div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            {{ form.ext|as_crispy_field }}
+          </div><div class="col-8"></div>
+        </div>
 
-      {% csrf_token %}
+        <input class="btn btn-primary" type="submit" value="Submit">
+      </form>
 
-      {{ form.as_p }}
-
-      <input class="btn btn-primary" type="submit" value="Submit">
-  </form>
+</div>
 
 
 {% endblock %}

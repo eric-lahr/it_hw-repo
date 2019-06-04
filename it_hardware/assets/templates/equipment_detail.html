@@ -26,74 +26,129 @@
 {% block content %}
 {% load staticfiles %}
 
-  <h1>{{ equipment.name }}</h1>
-  {% if ip_addr %}
-  <p><strong>IP:</strong> {{ ip_addr }}</p>
-  {% endif %}
-  <p><strong>Location:</strong> {{ equipment.asset_loc }}</p>
-  <p><strong>Department:</strong> {{ eq_dept }}
-  <p><strong>Category:</strong> {{asset_cat}}
+  <div class="container">
+    <div class="row">
+      <div class="col-4" id="equipment_name">
+        <div class="row">
+          <div class="col-8 my-auto">
+            <h2>{{ equipment.name }}</h2>
+          </div>
+          <div class="col-4">
+            <div class="btn-group-vertical" id="eq_group" role="group" aria-label="Equipment Detail">
+              <a class="btn btn-primary" href="{% url 'equipment-edit' object.pk %}" role="button">Edit</a>
+              <a class="btn btn-primary" href="{% url 'service-create' object.pk %}" role="button">Service</a>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEquipmentDetails">Details</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-7 ml-auto" id="eq_header_details">
+        <div class="row">
+          <div class="col-5 mr-auto">
+            <h5>Category: {{ equipment.asset_cat }}<br><br>Location: {{ equipment.asset_loc }}</h5>
+          </div>
+          <div class="col-5 ml-auto">
+            <h5>Department: {{eq_dept}}<br><br>{% if ip_addr %}IP: {{ ip_addr }}{% endif %}</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <a class="btn btn-primary" href="{% url 'equipment-edit' object.pk %}" role="button">Edit</a>
-  <a class="btn btn-primary" href="{% url 'service-create' object.pk %}" role="button">Service</a>
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEquipmentDetails">Details</button>
 
   <!-- Modal -->
   <div class="modal fade" id="modalEquipmentDetails" tabindex="-1" role="dialog" aria-labelledby="modelEquipmentDetailsTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header" id="details_modal_header">
           <h5 class="modal-title" id="modalLongTitle">{{ equipment.name }} details</h5>
           <button type="button" class="close" data-dismess="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          <table summary="equipment_values">
-              <tr><th>Attribute</th><th>Value</th></tr>
-              {% for key, value in obj_dict.items %}
-              <tr><strong><td>{{key}}</td></strong><td>{{value}}</td></tr>
-              {% endfor %}
-          </table>
+        <div class="modal-body" id="details_modal_body">
+          <div class="container" id="form_body">
+            <div class="row justify-content-center">
+              <div class="col-10">
+                {% for key, value in obj_dict.items %}
+                <div class="row">
+                  <div class="col-6">
+                    <p><strong>{{key}}</strong></p>
+                  </div>
+                  <div class="col-6">
+                    <p>{{value}}</p>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer" id="details_modal_footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
 
-  {% if messages %}
-  <ul class="messages">
-      {% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-      {% endfor %}
-  </ul>
 
-  {% endif %}
+<!-- message container -->
+{% if messages %}
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("#modalEditMessage").modal('show');
+      });
+    </script>
+{% endif %}
 
-  <h4>History</h4>
+<div class="modal fade" id="modalEditMessage" tabindex="-1" role="dialog" aria-labelledby="modelEquipmentEditTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" id="edit_modal_header">
+        <h5 class="modal-title" id="modalLongTitle">Edit Message</h5>
+        <button type="button" class="close" data-dismess="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="edit_modal_body">
+        {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </div>
+      <div class="modal-footer" id="edit_modal_footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm center-block text-center">
+        <h3 id="distribution">History</h3>
+      </div>
+    </div>
+  </div>
 
 {% if equipment_history %}
+  <div class="container">
+    <div class="row">
+      <table class="table table-bordered table-hover" id="eq_hist_table" summary="categories_values">
+        <thead class="thead-light">
+          <tr><th>Date and Time</th><th>Incident</th><th>Action Taken</th></tr>
+        </thead>
 
-  <table>
-    <thead>
-      <th>date and time</th>
-      <th>incident</th>
-      <th>action taken</th>
-    </thead>
+        {% for row in equipment_history %}
 
-    {% for row in equipment_history %}
+        <tr>
+          <td>{{ row.dt }}</td>
+          <td><a href="{{ row.get_absolute_url }}">{{ row.incident|truncatechars:30 }}</a></td>
+          <td>{{ row.act_detail|truncatechars:65 }}</td>
+        </tr>
 
-    <tr>
-      <td>{{ row.dt }}</td>
-      <td><a href="{{ row.get_absolute_url }}">{{ row.incident|truncatechars:30 }}</a></td>
-      <td>{{ row.act_detail|truncatechars:65 }}</td>
-    </tr>
-
-    {% endfor %}
-
-  </table>
+        {% endfor %}
 
 {% else %}
   <p>{{ equipment.name }} has no service record.</p>

@@ -26,18 +26,43 @@
 {% block content %}
 {% load staticfiles %}
 
-  <h1>{{ category.asset_cat }}</h1>
+<div class="container">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <p class="lead">{{cat}}</p>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <p>There are <strong>{{ cat_tot }}</strong> {{cat}}s.</p>
+    </div>
+  </div>
+</div>
 
-  <p>There are  <strong>{{ cat_tot }}</strong> of this asset type.</p>
 
   {% if cat_eq %}
-  <ul>
-      {% for asset in cat_eq %}
-        <li>
-            <a href="{{ asset.get_absolute_url }}">{{ asset.name }}</a>({{ asset.asset_loc }})({{ asset.ip_address }})
-        </li>
+  <div class="container">
+    <div class="card-deck">
+      {% for equip in cat_eq %}
+      <div class="col-md-3">
+        <div class="card" id="category_detail_card">
+          <div class="card-header">
+            <a id="card-title" href="{{ equip.get_absolute_url }}">{{ equip }}</a>
+          </div>
+          <div class="card-body">
+            {{ equip.asset_loc }}<br>
+            {% if equip.ip_address %}
+              {{ equip.ip_address }}<br>
+            {% endif %}
+            {{ equip.state }}<br>
+          </div>
+        </div>
+      </div>
       {% endfor %}
-  </ul>
+    </div>
+  </div>
   {% else %}
     <p>No assets to display.</p>
   {% endif %}

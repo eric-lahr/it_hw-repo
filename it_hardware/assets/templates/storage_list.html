@@ -24,15 +24,39 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Assets in Storage</h1>
+  <div class="container" id="zone_list_head">
+    <div class="row">
+      <div class="col-sm center-block text-center">
+        <h2>Assets in Storage</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm center-block text-center">
+        <p class="lead">There are <strong>{{ storage_list|length }}</strong> items in storage.</p>
+      </div>
+    </div>
+  </div>
+
   {% if storage_list %}
-  <ul>
+
+  <div class="container">
+    <div class="card-deck">
       {% for asset in storage_list %}
-        <li>
-            <a href="{{ asset.get_absolute_url }}">{{ asset }}</a>{{ asset.asset_cat }}{{asset.asset_loc}}
-        </li>
+      <div class="col-md-3">
+        <div class="card mt-3">
+          <div class="card-header">
+            <a id="card-title" href="{{ asset.get_absolute_url }}">{{ asset }}</a>
+          </div>
+          <div class="card-body">
+            <p><strong>{{asset.asset_cat }}</strong></p>
+            <p>{{ asset.asset_loc }}</p>
+          </div>
+        </div>
+      </div>
       {% endfor %}
-  </ul>
+    </div>
+  </div>
+
   {% else %}
     <p>There are no assets in storage.</p>
   {% endif %}

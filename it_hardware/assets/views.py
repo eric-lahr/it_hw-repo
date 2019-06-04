@@ -17,6 +17,8 @@ def index(request):
     cat_dict = {}
     zone_dict = {}
     dept_dict = {}
+    search_term = ''
+    searching = ''
     eq_tot = Equipment.objects.all().count()
     cats = Category.objects.all()
     for cat in cats:
@@ -58,6 +60,7 @@ def index(request):
         cat_count = Equipment.objects.filter(asset_loc__asset_loc='storage',
                                  asset_cat__asset_cat=c).count()
         store_dict[c] = cat_count
+    loc_tot = Location.objects.all().count()
 
     dhcp = Equipment.objects.filter(ip_config='DHCP').exclude(asset_loc__in=store_locs)
 
@@ -67,6 +70,11 @@ def index(request):
         t = Equipment.objects.get(name=eq)
         t.ip_address = ipaddr
         t.save()
+
+    if 'search' in request.GET:
+        search_term = request.GET['search']
+        searching = Equipment.objects.filter(name__icontains=search_term)
+
     context = {
             'cat_dict': cat_dict,
             'zone_dict': zone_dict,
@@ -74,14 +82,49 @@ def index(request):
             'eq_tot': eq_tot,
             'store_dict': store_dict,
             'store_count': store_count,
+            'loc_tot': loc_tot,
+            'search_term': search_term,
+            'searching': searching,
 }
 
     return render(request, 'index.html', context=context)
 
-class ZoneListView(generic.ListView):
-    context_object_name = 'zone_list'
-    queryset = Zone.objects.all().exclude(zone_loc='storage')
+# class ZoneListView(generic.ListView):
+#    context_object_name = 'zone_list'
+#    queryset = Zone.objects.all().exclude(zone_loc='storage')
+#    template_name = 'zone_list.html'
+
+class ZoneListView(generic.TemplateView):
     template_name = 'zone_list.html'
+
+    def get_context_data(self, *args, **kwargs):
+        zone_info = {}
+        search_term = ''
+        searching = ''
+        context = super(ZoneListView, self).get_context_data(*args, **kwargs)
+        zones = Zone.objects.all().exclude(zone_loc='storage')
+        for z in zones:
+            #print(z)
+            e_tot = 0
+            loc_tot = Location.objects.filter(zone_loc__zone_loc=z)
+            #print(loc_tot)
+            for l in loc_tot:
+                #print(l)
+                e = Equipment.objects.filter(asset_loc=l).count()
+                #print(e)
+                e_tot += e
+            loc_tot = loc_tot.count()
+            zone_info[z] = [loc_tot, e_tot]
+
+        if 'search' in self.request.GET:
+            search_term = self.request.GET['search']
+            searching = Equipment.objects.filter(name__icontains=search_term)
+
+        context['zones'] = zones.count()
+        context['zone_info'] = zone_info
+        context['search_term'] = search_term
+        context['searching'] = searching
+        return context
 
 class ZoneDetailView(generic.DetailView):
     model = Zone
@@ -89,8 +132,15 @@ class ZoneDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ZoneDetailView,self).get_context_data(**kwargs)
+        loc_list = Location.objects.filter(zone_loc=self.object)
+        eq_tot = 0
+        loc_dict = {}
+        for lo in loc_list:
+            at_loc = Equipment.objects.filter(asset_loc__asset_loc=lo)
+            loc_dict[lo] = at_loc
+        print(loc_dict)
         context['loc_num'] = Location.objects.filter(zone_loc=self.object).count()
-        context['loc_list'] = Location.objects.filter(zone_loc=self.object)
+        context['loc_dict'] = loc_dict
         return context
 
 class LocationDetailView(generic.DetailView):
@@ -103,10 +153,18 @@ class LocationDetailView(generic.DetailView):
         context['loc_eq'] = Equipment.objects.filter(asset_loc=self.object)
         return context
 
-class CategoryListView(generic.ListView):
-    context_object_name = 'category_list'
-    queryset = Category.objects.all()
+class CategoryListView(generic.TemplateView):
     template_name = 'category_list.html'
+
+    def get_context_data(self, *args, **kwargs):
+        cat_info = {}
+        context = super(CategoryListView, self).get_context_data(*args, **kwargs)
+        categories = Category.objects.all()
+        for c in categories:
+            e_tot = Equipment.objects.filter(asset_cat__asset_cat=c).count()
+            cat_info[c] = e_tot
+        context['cat_info'] = cat_info
+        return context
 
 class CategoryDetailView(generic.DetailView):
     model = Category
@@ -116,6 +174,7 @@ class CategoryDetailView(generic.DetailView):
         context = super(CategoryDetailView,self).get_context_data(**kwargs)
         context['cat_tot'] = Equipment.objects.filter(asset_cat=self.object).count()
         context['cat_eq'] = Equipment.objects.filter(asset_cat=self.object)
+        context['cat'] = self.object
         return context
 
 class StorageListView(generic.ListView):
@@ -456,12 +515,13 @@ class QuickMoveView(generic.FormView):
         new_loc = form.cleaned_data['location']
         move_eq = (form.cleaned_data['assets'].split('\r\n'))
         valid_loc = Location.objects.filter(asset_loc=new_loc).first()
-        new_loc_rec = Location.objects.get(asset_loc=new_loc)
 
         if not valid_loc:
             messages.error(self.request, "{} is not a valid location.".format(new_loc))
+            return super(QuickMoveView, self).form_valid(form)
         else:
             remove = []
+            new_loc_rec = Location.objects.get(asset_loc=new_loc)
             for eq_mv in move_eq:
                 valid_eq = Equipment.objects.filter(name=eq_mv).first()
                 if not valid_eq:

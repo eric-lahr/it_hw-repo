@@ -4,7 +4,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = 'date'
-    
+
 class EditForm(forms.ModelForm):
 
     class Meta:
@@ -18,7 +18,7 @@ class EditForm(forms.ModelForm):
     def clean(self):
         self.cleaned_data = super().clean()
         return self.cleaned_data
-        
+
 
 class ServiceForm(forms.ModelForm):
 

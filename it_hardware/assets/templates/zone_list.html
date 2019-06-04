@@ -24,16 +24,69 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Zone List</h1>
-  {% if zone_list %}
-  <ul>
-      {% for zone in zone_list %}
-        <li>
-            <a href="{{ zone.get_absolute_url }}">{{ zone.zone_loc }}</a>
-        </li>
-      {% endfor %}
-  </ul>
-  {% else %}
-    <p>There are no zones in the system.</p>
-  {% endif %}
+{% if searching %}
+  <div class="container" id="zone_list_head">
+    <div class="row">
+      <div class="col-sm center-block text-center">
+        <h2>Search Results</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm center-block text-center">
+        <p class="lead">Displaying <strong>{{ searching|length }}</strong> results.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="search_reults">
+    <div class="row">
+      <div class="col-sm center-block text-center">
+        <ul>
+        {% for element in searching %}
+          <li><a href="{{ element.get_absolute_url }}">{{element}}</a></li>
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{% else %}
+
+    <div class="container" id="zone_list_head">
+      <div class="row">
+        <div class="col-sm center-block text-center">
+          <h2>Zone List</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm center-block text-center">
+          <p class="lead">There are <strong>{{ zones }}</strong> zones.</p>
+        </div>
+      </div>
+    </div>
+
+    {% if zone_info %}
+    <div class="container">
+      <div class="card-deck">
+        {% for key, value in zone_info.items %}
+        <div class="col-md-3">
+          <div class="card mt-3">
+            <div class="card-header">
+              <a id="card-title" href="{{ key.get_absolute_url }}">{{ key }}</a>
+            </div>
+            <div class="card-body">
+              <p>Locations: {{value.0}}</p>
+              <p>Equipment: {{value.1}}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% else %}
+      <p>There are no zones in the system.</p>
+    {% endif %}
+
+{% endif %}
 {% endblock %}

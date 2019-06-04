@@ -1,13 +1,203 @@
-.jumbotron {
-  position: relative;
-  overflow: hidden;
-  background-color: light-gray;
-  text-align: center;
-  padding-bottom: 40px;
-  padding-top: 40px;
+/* custom css */
+
+/* global */
+body {
+  background-color: #d8e5f0;
 }
 
+.lead {
+  font-family: 'Roboto Slab', serif;
+}
+
+/* navbar */
 .navbar {
   margin: 10px;
   background-image: linear-gradient(to right, #0076b7, #203a74);
+  position: relative;
+  font-family: 'Roboto Slab', serif;
+}
+
+.logo {
+  position: absolute;
+  z-index: 1;
+  top: 2%;
+  height: auto;
+}
+
+#navbarSupportedContent {
+  margin-left: 8%;
+}
+
+.search-button {
+  color: #d8e5f0;
+  border-color: #d8e5f0;
+}
+
+.search-button:hover,
+.search-button:active,
+.search-button:focus {
+  background-color: #d8e5f0;
+  border-color: #d8e5f0;
+  box-shadow: 0 0 0 0.2rem rgba(255, 115, 93, 0.5);
+}
+
+/* all primary buttons */
+.btn-primary {
+  background-color: #0076b7;
+  border-color: #0076b7;
+  color: #d8e5f0;
+  font-family: 'Roboto Slab', serif;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+  background-color: #203a74;
+  border-color: #203a74;
+  color: #d8e5f0;
+}
+
+/* home page */
+#mainpage {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  background-image: linear-gradient(to right, #0076b7, #203a74);
+  color: #d8e5f0;
+  margin-top: 20px;
+  font-family: 'Roboto Slab', serif;
+  font-weight: bold;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#main-title {
+  font-family: 'Exo2', sans-serif;
+  font-weight: bold;
+}
+
+#main-title-sub {
+  font-family: 'Roboto Slab', serif;
+  font-weight: bold;
+}
+
+#distribution {
+  margin-bottom: 3%;
+  font-family: 'Roboto Slab', serif;
+  font-weight: bold;
+}
+
+#distro-by {
+  font-family: 'Roboto Slab', serif;
+  font-weight: bold;
+}
+
+.table {
+  font-family: 'Roboto Slab', serif;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* all cards*/
+.card-header {
+  background-image: linear-gradient(to right, #0076b7, #203a74);
+}
+
+.card {
+  font-family: 'Roboto Slab', serif;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* applied to all cards */
+#card-title {
+  color: #d8e5f0;
+  font-family: 'Roboto Slab', serif;
+}
+
+.card-body, .card-footer {
+  font-family: 'Roboto Slab', serif;
+}
+
+#card-title:hover {
+  color: #eaeff5;
+}
+
+
+/* zone list page */
+#zone_list_head {
+  margin-top: 3%;
+  margin-bottom: 1%;
+  font-family: 'Roboto Slab', serif;
+  font-weight: bold;
+}
+/* zone detail cards */
+#zn_detail_cards, #category_detail_card {
+  height: calc(100% - 15px);
+  margin-bottom: 15px;
+}
+
+/* equipment detail button group - Edit_Service_Details */
+#eq_group {
+  margin: 0;
+  padding: 0;
+}
+
+/* equipment detail header */
+#equipment_name, #report_container {
+  border-style: solid;
+  border-radius: 25px;
+  background-color: #A9CCE3;
+  padding: 1% 1% 1% 1%;
+  margin-top: 2%;
+  font-family: 'Exo2', sans-serif;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#eq_header_details {
+  border-style: solid;
+  border-radius: 25px;
+  background-color: #A9CCE3;
+  padding: 2% 1% 1% 2%;
+  margin-top: 2%;
+  margin-bottom: 2%;
+  font-family: 'Exo2', sans-serif;
+  font-weight: bold;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#details_modal_header, #edit_modal_header, #check_modal_header,
+ #quick_modal_header {
+  background-image: linear-gradient(to right, #0076b7, #203a74);
+  color: #d8e5f0;
+  font-family: 'Exo2', sans-serif;
+}
+
+#details_modal_body, #details_modal_footer, #edit_modal_body,
+ #edit_modal_footer, #check_modal_body, #check_modal_footer,
+ #quick_modal_body, #quick_modal_footer {
+  background-color: #d8e5f0;
+  font-family: 'Roboto Slab', serif;
+}
+
+/* equipment detail page MESSAGE jumbotron */
+#eq_hist_table {
+  margin-top: 1%;
+}
+
+/* incident detail page */
+#title {
+  margin-top: 2%;
+  margin-bottom: 3%;
+  font-family: 'Exo2', sans-serif;
+}
+
+#equipment_name {
+  margin-bottom: 2%;
+}
+
+#report_container {
+  margin-bottom: 5%;
+}
+
+#incident_detail {
+  margin-top: 4%;
+  font-family: 'Exo2', sans-serif;
 }

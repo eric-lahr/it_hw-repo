@@ -1,25 +1,91 @@
 {% extends "base_generic.html" %}
 
+{% block navbar %}
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'index' %}">Home</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'zones' %}">Zones</a>
+    </li>
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'categories' %}">Assets <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'storage' %}">Storage</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'location-check' %}">Location Check</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'quick-move' %}">Quick Move</a>
+    </li>
+  </ul>
+{% endblock %}
+
 {% block content %}
 {% load staticfiles %}
 
-  <h1>Incident Record</h1>
-  <h4>{{ incident_record.name }}</h4>
+<div class="container" id="title">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <h1>Incident Report</h1>
+    </div>
+  </div>
+</div>
 
-  <p>Date and Time: {{ incident_record.dt }}</p>
-
-  <p>Incident:</p>
-
-  {{ incident_record.incident }}
-
-  <p>Action taken:</p>
-
-  {{ incident_record.act_detail }}
-
-  <p>Result:</p>
-
-  {{ incident_record.result }}
-
-  <a class="btn btn-primary" href="{{ request.META.HTTP_REFERER }}" role="button">Back</a>
+<div class="container" id="form_body">
+  <div class="row justify-content-center">
+    <div class="col-8">
+      <div class="row">
+        <div class="container" id="equipment_name">
+          <div class="row">
+            <div class="col-6">
+              <h4>{{ incident_record.name }}</h4>
+            </div>
+            <div class="col-6">
+              <h4>{{ incident_record.dt }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="container" id="incident_detail">
+          <div class="row">
+            <div class="col-6">
+              <h5><strong>Incident:</strong></h5>
+            </div><div class="col-6"></div>
+          </div>
+          <div class="row">
+            <div class="container" id="report_container">
+              {{ incident_record.incident }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <h5><strong>Action Taken:</strong></h5>
+            </div><div class="col-6"></div>
+          </div>
+          <div class="row">
+            <div class="container" id="report_container">
+              {{ incident_record.act_detail }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <h5><strong>Results:</strong></h5>
+            </div><div class="col-6"></div>
+          </div>
+          <div class="row">
+            <div class="container" id="report_container">
+              {{ incident_record.result }}
+            </div>
+          </div>
+          <div class="row">
+            <a class="btn btn-primary" href="{{ request.META.HTTP_REFERER }}" role="button">Back</a>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

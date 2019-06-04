@@ -1,16 +1,58 @@
 {% extends "base_generic.html" %}
 
+{% block navbar %}
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'index' %}">Home</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'zones' %}">Zones</a>
+    </li>
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'categories' %}">Assets <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'storage' %}">Storage</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'location-check' %}">Location Check</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'quick-move' %}">Quick Move</a>
+    </li>
+  </ul>
+{% endblock %}
+
 {% block content %}
 {% load staticfiles %}
+{% load crispy_forms_tags %}
 
-  <form action='.' method="POST">
+<div class="container">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <h4>Equipment Service</h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <p class="lead">Enter the reason for the call, the action taken, and the result.</p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-8">
+      <hr class="mt-0 mb-4">
+      <form action='.' method="POST">
 
       {% csrf_token %}
 
-      {{ form.as_p }}
+      {{ form|crispy }}
 
       <input class="btn btn-primary" type="submit" value="Submit">
   </form>
+</div>
 
 
 {% endblock %}

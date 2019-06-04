@@ -25,19 +25,40 @@
 
 {% block content %}
 {% load staticfiles %}
-
-  <h1>{{ location.asset_loc }}</h1>
-
-  <p>This location has <strong>{{ loc_tot }}</strong> assets.</p>
+<div class="container" id="zone_list_head">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <h2>{{ location.asset_loc }}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <h4>{{ location.dept }}</h4>
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <p>This location has <strong>{{ loc_tot }}</strong> assets.</p>
+    </div>
+  </div>
+</div>
 
   {% if loc_eq %}
-  <ul>
-      {% for asset in loc_eq %}
-        <li>
-            <a href="{{ asset.get_absolute_url }}">{{ asset.name }}</a>({{ asset.asset_cat }})
-        </li>
+  <div class="container">
+    <div class="card-deck">
+      {% for e in loc_eq %}
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-header">
+            <a id="card-title" href="{{ e.get_absolute_url }}">{{e}}</a>
+          </div>
+          <div class="card-body">
+            <p>IP: {{ e.ip_address }}</p>
+            <p>Deployed: {{ e.d_date }}</p>
+          </div>
+        </div>
+      </div>
       {% endfor %}
-  </ul>
+    </div>
+  </div>
   {% else %}
     <p>This location has no assets assiged to it.</p>
   {% endif %}

@@ -25,27 +25,64 @@
 
 {% block content %}
 {% load staticfiles %}
+{% load crispy_forms_tags %}
 
-<h3>Quick Move</h3>
+<div class="container">
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <h4>Quick Move</h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm center-block text-center">
+      <p class="lead">Add the new location and the assets you would like to move..</p>
+    </div>
+  </div>
+</div>
 
-<p>Add the new location and the assets you would like to move.</p>
-
-  <form action='.' method="POST">
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-8">
+      <hr class="mt-0 mb-4">
+      <form action='.' method="POST">
 
       {% csrf_token %}
 
-      {{ form.as_p }}
+      {{ form|crispy }}
 
       <input class="btn btn-primary" type="submit" value="Submit">
   </form>
+</div>
 
-  {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-    <li class="{{ message.tags}}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+{% if messages %}
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("#modalQuickMoveMessage").modal('show');
+      });
+    </script>
+{% endif %}
+
+<div class="modal fade" id="modalQuickMoveMessage" tabindex="-1" role="dialog" aria-labelledby="modelQuickMoveTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" id="quick_modal_header">
+        <h5 class="modal-title" id="modalLongTitle">Quick Move Message</h5>
+        <button type="button" class="close" data-dismess="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="quick_modal_body">
+        {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </div>
+      <div class="modal-footer" id="quick_modal_footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 {% endblock %}

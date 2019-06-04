@@ -37,7 +37,7 @@ class Zone(models.Model):
 
     def get_absolute_url(self):
         return reverse('zone-detail', args=[str(self.id)])
-
+        
     class Meta:
         verbose_name_plural='zones'
 
@@ -139,7 +139,7 @@ class Equipment(models.Model):
             (STATIC, 'STATIC'),
             (NA, 'N/A'),
     )
-    
+
     ip_config = models.CharField(
             max_length=6,
             choices=IP_CONFIG_CHOICES,
@@ -228,7 +228,7 @@ class Equipment(models.Model):
             null=True,
             default=None,
             verbose_name='purchase price')
-        
+
 
     d_date = models.DateField(
             auto_now=False,
