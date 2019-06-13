@@ -15,6 +15,7 @@ urlpatterns = [
         path('equipment/<int:equipment_pk>/service/', views.EquipmentServiceView.as_view(), name='service-create'),
         path('equipment/<int:pk>/edit/', views.EquipmentEditView.as_view(), name='equipment-edit'),
         path('storage/', views.StorageListView.as_view(), name='storage'),
+        path('results/', views.search, name='search'),
 ]
 
 

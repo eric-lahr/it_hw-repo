@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from assets.models import Category, Location, Department, Equipment, Action, Zone, Status
-#from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.views import generic
 from django.urls import reverse
@@ -9,6 +8,7 @@ from assets.forms import ServiceForm, LocationCheckForm, EditForm
 from django.shortcuts import get_object_or_404
 from datetime import datetime
 import socket
+from itertools import chain
 
 
 # Create your views here.
@@ -119,11 +119,13 @@ class ZoneListView(generic.TemplateView):
         if 'search' in self.request.GET:
             search_term = self.request.GET['search']
             searching = Equipment.objects.filter(name__icontains=search_term)
+            context['search_term'] = search_term
+            context['searching'] = searching
 
         context['zones'] = zones.count()
         context['zone_info'] = zone_info
-        context['search_term'] = search_term
-        context['searching'] = searching
+        # context['search_term'] = search_term
+        # context['searching'] = searching
         return context
 
 class ZoneDetailView(generic.DetailView):
@@ -282,7 +284,6 @@ class EquipmentEditView(generic.UpdateView):
                         ), incident = '')
 
             if k == 'i_date':
-                print(v)
                 if img != '':
                     new_image = Action.objects.create(name=self.object, act='CHANGE',
                                                       incident = '',
@@ -713,3 +714,23 @@ class IncidentDetailView(generic.DetailView):
         context = super(IncidentDetailView, self).get_context_data(**kwargs)
         context['incident_record'] = Action.objects.filter(id=self.object.id).first()
         return context
+
+def search(request):
+    search_term = ''
+    searching = ''
+
+    if 'search' in request.GET:
+        search_term = request.GET['search']
+        eqs = Equipment.objects.filter(name__icontains=search_term)
+        locs = Location.objects.filter(asset_loc__icontains=search_term)
+        search_tot = eqs.count() + locs.count()
+        searching = chain(eqs, locs)
+    return render(
+        request,
+        'results.html',
+        context = {
+            'search_term': search_term,
+            'searching': searching,
+            'search_tot': search_tot,
+        }
+        )

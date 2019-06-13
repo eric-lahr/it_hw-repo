@@ -201,3 +201,8 @@ body {
   margin-top: 4%;
   font-family: 'Exo2', sans-serif;
 }
+
+/* search reslts page */
+#search_results {
+  font-family: 'Roboto Slab', serif;
+}
